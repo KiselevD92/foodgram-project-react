@@ -1,5 +1,6 @@
 from django.core.validators import MinValueValidator
 from django.db import models
+
 from users.models import User
 
 
@@ -37,15 +38,6 @@ class Ingredient(models.Model):
         max_length=20,
         verbose_name='Название ингредиента'
     )
-    amount = models.IntegerField(
-        validators=[
-            MinValueValidator(
-                0,
-                message='Не может быть отрицательным числом'
-            ),
-        ],
-        verbose_name='Количество'
-    )
     measurement_unit = models.CharField(
         max_length=200,
         verbose_name='Единицы измерения'
@@ -79,11 +71,11 @@ class Recipe(models.Model):
     text = models.TextField(
         verbose_name='Описание рецепта',
     )
-    ingredient = models.ForeignKey(
+    ingredients = models.ManyToManyField(
         Ingredient,
-        on_delete=models.CASCADE,
-        related_name='recipes',
-        verbose_name='Ингредиент',
+        through='RecipeIngredient',
+        through_fields=('recipe', 'ingredient'),
+        verbose_name='Ингредиенты',
     )
     tag = models.ForeignKey(
         Tag,
@@ -112,6 +104,34 @@ class Recipe(models.Model):
         ordering = ['-pub_date']
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
+
+
+class RecipeIngredient(models.Model):
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        verbose_name='Рецепт',
+        related_name='recipes'
+    )
+    ingredient = models.ForeignKey(
+        Ingredient,
+        on_delete=models.CASCADE,
+        verbose_name='Ингредиент',
+        related_name='ingredients'
+    )
+    amount = models.IntegerField(
+        validators=[
+            MinValueValidator(
+                0,
+                message='Не может быть отрицательным числом'
+            ),
+        ],
+        verbose_name='Количество'
+    )
+
+    class Meta:
+        verbose_name = 'Ингредиент в рецепте'
+        verbose_name_plural = 'Ингредиенты в рецепте'
 
 
 class Favorite(models.Model):
