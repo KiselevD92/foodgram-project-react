@@ -36,7 +36,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class SetPasswordSerializer(serializers.Serializer):
     new_password = serializers.CharField(style={'input_type': 'password'})
-    current_password = serializers.CharField(style={'input_type": "password'})
+    current_password = serializers.CharField(style={'input_type': 'password'})
 
     def validate(self, obj):
         try:
