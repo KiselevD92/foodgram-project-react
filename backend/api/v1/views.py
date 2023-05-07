@@ -111,11 +111,11 @@ class CustomUsersViewSet(viewsets.ModelViewSet):
     permission_classes = (AllowAny,)
 
     @action(detail=False, permission_classes=(IsAuthenticated,),
-            methods=["post"])
+            methods=['post'])
     def set_password(self, request, *args, **kwargs):
         serializer = SetPasswordSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        self.request.user.set_password(serializer.data["new_password"])
+        self.request.user.set_password(serializer.data['new_password'])
         self.request.user.save()
         return Response(
             {'detail': 'Пароль успешно изменен'},
