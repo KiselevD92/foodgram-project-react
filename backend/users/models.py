@@ -5,7 +5,7 @@ from django.db import models
 class User(AbstractUser):
     first_name = models.CharField(max_length=150, blank=True)
     last_name = models.CharField(max_length=150, blank=True)
-    email = models.EmailField(blank=True, unique=True)
+    email = models.EmailField(unique=True)
 
     class Meta:
         verbose_name = 'Имя пользователя'
