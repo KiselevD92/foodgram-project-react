@@ -31,6 +31,7 @@ class IngredientAdmin(admin.ModelAdmin):
 
 class UserAdmin(admin.ModelAdmin):
     list_filter = ('email', 'username',)
+    search_fields = ('email', 'username',)
 
 
 admin.site.register(Recipe, RecipeAdmin)
