@@ -34,13 +34,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if request.method == 'POST':
             serializer = ShortInfoRecipeSerializer(recipe, data=request.data)
             serializer.is_valid(raise_exception=True)
-            if ShoppingCart.objects.filter(
-                    user=request.user, recipe=recipe
-            ).exists():
-                return Response(
-                    {'errors': 'Рецепт уже добавлен в корзину'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
             ShoppingCart.objects.create(user=request.user, recipe=recipe)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -74,13 +67,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if request.method == 'POST':
             serializer = ShortInfoRecipeSerializer(recipe, data=request.data)
             serializer.is_valid(raise_exception=True)
-            if Favorite.objects.filter(
-                    user=request.user, recipe=recipe
-            ).exists():
-                return Response(
-                    {'errors': 'Рецепт уже добавлен в избранное'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
             Favorite.objects.create(user=request.user, recipe=recipe)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -152,14 +138,6 @@ class CustomUsersViewSet(viewsets.ModelViewSet):
                 context={'request': request}
             )
             serializer.is_valid(raise_exception=True)
-            if Follow.objects.filter(
-                    user=request.user,
-                    following=following
-            ).exists():
-                return Response(
-                    {'errors': 'Подписка уже активна'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
             Follow.objects.create(user=request.user, following=following)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
