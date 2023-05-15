@@ -6,7 +6,7 @@ COPY requirements.txt /app
 
 RUN pip install --upgrade pip
 
-RUN pip3 install -r /app/requirements.txt --no-cache-dir
+RUN pip install -r /app/requirements.txt --no-cache-dir
 
 COPY . .
 

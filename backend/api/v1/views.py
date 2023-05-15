@@ -23,6 +23,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
     pagination_class = LimitOffsetPagination
     permission_classes = (IsAuthorOrReadOnly,)
 
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=(IsAuthenticated,))
     def shopping_cart(self, request, **kwargs):

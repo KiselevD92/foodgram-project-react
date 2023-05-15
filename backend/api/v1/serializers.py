@@ -39,14 +39,9 @@ class SetPasswordSerializer(serializers.Serializer):
     current_password = serializers.CharField(style={'input_type': 'password'})
 
     def validate(self, obj):
-        try:
-            validate_password(obj['new_password'])
-        except django_exceptions.ValidationError as e:
-            raise serializers.ValidationError(
-                {'new_password': list(e.messages)}
-            )
-        return super().validate(obj)
-
+        if obj['new_password'] == obj['current_password']:
+            raise serializers.ValidationError({'errors': 'Пароли не могут совпадать'})
+        return obj
 
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
