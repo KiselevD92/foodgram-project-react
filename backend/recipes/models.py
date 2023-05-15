@@ -1,4 +1,3 @@
-from django.core.validators import MinValueValidator
 from django.db import models
 
 from users.models import User
@@ -35,7 +34,7 @@ class Tag(models.Model):
 
 class Ingredient(models.Model):
     name = models.CharField(
-        max_length=20,
+        max_length=200,
         verbose_name='Название ингредиента'
     )
     measurement_unit = models.CharField(
@@ -83,13 +82,7 @@ class Recipe(models.Model):
         related_name='recipes',
         verbose_name='Тег',
     )
-    cooking_time = models.IntegerField(
-        validators=[
-            MinValueValidator(
-                1,
-                message='Не может быть ниже одной минуты'
-            ),
-        ],
+    cooking_time = models.PositiveIntegerField(
         verbose_name='Время приготовления'
     )
     pub_date = models.DateTimeField(
@@ -119,13 +112,7 @@ class RecipeIngredient(models.Model):
         verbose_name='Ингредиент',
         related_name='ingredients'
     )
-    amount = models.IntegerField(
-        validators=[
-            MinValueValidator(
-                0,
-                message='Не может быть отрицательным числом'
-            ),
-        ],
+    amount = models.PositiveIntegerField(
         verbose_name='Количество'
     )
 

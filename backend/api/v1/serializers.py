@@ -39,13 +39,9 @@ class SetPasswordSerializer(serializers.Serializer):
     current_password = serializers.CharField(style={'input_type': 'password'})
 
     def validate(self, obj):
-        try:
-            validate_password(obj['new_password'])
-        except django_exceptions.ValidationError as e:
-            raise serializers.ValidationError(
-                {'new_password': list(e.messages)}
-            )
-        return super().validate(obj)
+        if obj['new_password'] == obj['current_password']:
+            raise serializers.ValidationError({'errors': 'Пароли не могут совпадать'})
+        return obj
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -119,6 +115,19 @@ class ShortInfoRecipeSerializer(serializers.ModelSerializer):
         model = Recipe
         fields = ('id', 'name', 'image', 'cooking_time')
 
+    # def validate(self, obj):
+    #     user = self.context.get('request').user
+    #     recipe = self.context.get('recipe_id')
+    #     if ShoppingCart.objects.filter(
+    #                 user=user, recipe=recipe
+    #     ).exists():
+    #         raise serializers.ValidationError('Рецепт уже добавлен в корзину')
+    #     if Favorite.objects.filter(
+    #             user=user, recipe=recipe
+    #     ).exists():
+    #         raise serializers.ValidationError('Рецепт уже добавлен в избранное')
+    #     return obj
+
 
 class FollowSerializer(serializers.ModelSerializer):
     username = serializers.ReadOnlyField()
@@ -138,6 +147,16 @@ class FollowSerializer(serializers.ModelSerializer):
             'recipes',
             'recipes_count'
         )
+
+    # def validate(self, obj):
+    #     user = self.context.get('request').user
+    #     author = self.context.get('author_id')
+    #     if Follow.objects.filter(
+    #             user=user,
+    #             following=author
+    #     ).exists():
+    #         raise serializers.ValidationError('Подписка уже активна')
+    #     return obj
 
     def get_is_subscribed(self, obj):
         if Follow.objects.filter(
