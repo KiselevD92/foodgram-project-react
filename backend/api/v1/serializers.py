@@ -1,5 +1,3 @@
-from django.contrib.auth.password_validation import validate_password
-from django.core import exceptions as django_exceptions
 from rest_framework import serializers
 
 from recipes.models import (
@@ -40,7 +38,9 @@ class SetPasswordSerializer(serializers.Serializer):
 
     def validate(self, obj):
         if obj['new_password'] == obj['current_password']:
-            raise serializers.ValidationError({'errors': 'Пароли не могут совпадать'})
+            raise serializers.ValidationError(
+                {'errors': 'Пароли не могут совпадать'}
+            )
         return obj
 
 
