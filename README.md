@@ -6,44 +6,30 @@
 ## Инструкции по запуску
 
 **Как запустить проект:**
-Клонировать репозиторий и перейти в него в командной строке:
+Описание команд для запуска приложения в контейнерах:
 
 ```bash
-@git clone https://github.com/KiselevD92/foodgram-project-react.git
-@cd api_yamdb
+sudo docker-compose up #для запуска контейнера
+sudo docker-compose exec backend python manage.py migrate # выполнить миграции
+sudo docker-compose exec backend python manage.py createsuperuser # создать суперпользователя
+sudo docker-compose exec backend python manage.py collectstatic --no-input # собрать статику
+sudo docker-compose exec backend python manage.py loaddata ./static/data/data.json #загрузка бд
 ```
 
-Cоздать и активировать виртуальное окружение:
-
+Остановка и удаление контейнеров вместе с зависимостями
 ```bash
-@python3 -m venv env
-@source env/bin/activate
+docker-compose down -v
 ```
 
-Установить зависимости из файла requirements.txt:
-
+Образ на сайте DockerHub
 ```bash
-@python3 -m pip install --upgrade pip
-@pip install -r requirements.txt
+kiselevdv/foodgram-backend:latest
 ```
 
-Выполнить миграции:
-
+## Данные для входа в админку:
 ```bash
-@python3 manage.py migrate
-```
-
-Запустить проект:
-
-```bash
-@python3 manage.py runserver
-```
-
-Вход в админку
-
-```bash
-username: admin
-password: admin
+Username: admin
+Password: admin
 ```
 
 ## Использованные технологии
