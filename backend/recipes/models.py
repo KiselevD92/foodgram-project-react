@@ -1,3 +1,4 @@
+from django.core.validators import MinValueValidator
 from django.db import models
 
 from users.models import User
@@ -83,6 +84,9 @@ class Recipe(models.Model):
         verbose_name='Тег',
     )
     cooking_time = models.PositiveIntegerField(
+        validators=[
+            MinValueValidator(1)
+        ],
         verbose_name='Время приготовления'
     )
     pub_date = models.DateTimeField(
@@ -113,6 +117,9 @@ class RecipeIngredient(models.Model):
         related_name='ingredients'
     )
     amount = models.PositiveIntegerField(
+        validators=[
+            MinValueValidator(1)
+        ],
         verbose_name='Количество'
     )
 
