@@ -120,7 +120,7 @@ class CustomUsersViewSet(viewsets.ModelViewSet):
     @action(detail=False, permission_classes=(IsAuthenticated,),
             methods=['get'])
     def subscriptions(self, request):
-        queryset = User.objects.filter(following__user=request.user)
+        queryset = Follow.objects.filter(following__user=request.user)
         serializer = FollowSerializer(
             queryset, many=True,
             context={'request': request}
