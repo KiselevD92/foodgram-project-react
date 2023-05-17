@@ -149,3 +149,6 @@ class CustomUsersViewSet(viewsets.ModelViewSet):
                 {'detail': 'Подписка успешно отменена'},
                 status=status.HTTP_204_NO_CONTENT
             )
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
