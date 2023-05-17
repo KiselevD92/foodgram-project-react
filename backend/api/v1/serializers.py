@@ -51,7 +51,7 @@ class TagSerializer(serializers.ModelSerializer):
             'id',
             'name',
             'color',
-            'slug
+            'slug',
         )
 
 
