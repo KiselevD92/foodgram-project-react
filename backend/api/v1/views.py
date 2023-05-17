@@ -82,7 +82,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
 class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
-    serializer_class = TagSerializer(result, many=True)
+    serializer_class = TagSerializer
     pagination_class = None
     permission_classes = (AllowAny,)
 
