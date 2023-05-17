@@ -110,13 +110,18 @@ class RecipeSerializer(serializers.ModelSerializer):
 class ShortInfoRecipeSerializer(serializers.ModelSerializer):
     name = serializers.ReadOnlyField()
     cooking_time = serializers.ReadOnlyField()
+    cart_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Recipe
         fields = ('id', 'name', 'image', 'cooking_time')
 
+    def get_cart_count(self, obj):
+        return obj.shoppingcart.count()
+
 
 class FollowSerializer(serializers.ModelSerializer):
+    username = serializers.ReadOnlyField()
     is_subscribed = serializers.SerializerMethodField()
     recipes = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
