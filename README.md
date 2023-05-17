@@ -6,6 +6,8 @@
 
 ## Инструкции по запуску
 
+### Адрес проекта http://158.160.40.200//
+
 **Как запустить проект:**
 Описание команд для запуска приложения в контейнерах:
 
@@ -14,7 +16,7 @@ sudo docker-compose up #для запуска контейнера
 sudo docker-compose exec backend python manage.py migrate # выполнить миграции
 sudo docker-compose exec backend python manage.py createsuperuser # создать суперпользователя
 sudo docker-compose exec backend python manage.py collectstatic --no-input # собрать статику
-sudo docker-compose exec backend python manage.py loaddata ./static/data/data.json #загрузка бд
+sudo docker-compose exec backend python manage.py loaddata ./fixtures.json #загрузка бд
 ```
 
 Остановка и удаление контейнеров вместе с зависимостями
