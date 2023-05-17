@@ -11,7 +11,7 @@ from api.v1.serializers import (
     RecipeSerializer, TagSerializer,
     IngredientSerializer, UserSerializer,
     FollowSerializer, ShortInfoRecipeSerializer,
-    SetPasswordSerializer
+    SetPasswordSerializer, SubscribeSerializer
 )
 from recipes.models import Recipe, Tag, Ingredient, Favorite, ShoppingCart
 from users.models import User, Follow
@@ -133,7 +133,7 @@ class CustomUsersViewSet(viewsets.ModelViewSet):
         following = get_object_or_404(User, id=kwargs['pk'])
 
         if request.method == 'POST':
-            serializer = FollowSerializer(
+            serializer = SubscribeSerializer(
                 following, data=request.data,
                 context={'request': request}
             )

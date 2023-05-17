@@ -110,14 +110,10 @@ class RecipeSerializer(serializers.ModelSerializer):
 class ShortInfoRecipeSerializer(serializers.ModelSerializer):
     name = serializers.ReadOnlyField()
     cooking_time = serializers.ReadOnlyField()
-    cart_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Recipe
         fields = ('id', 'name', 'image', 'cooking_time')
-
-    def get_cart_count(self, obj):
-        return obj.shoppingcart.count()
 
 
 class FollowSerializer(serializers.ModelSerializer):
@@ -129,8 +125,11 @@ class FollowSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
+            'email',
             'id',
             'username',
+            'first_name',
+            'last_name',
             'is_subscribed',
             'recipes',
             'recipes_count'
@@ -152,3 +151,13 @@ class FollowSerializer(serializers.ModelSerializer):
 
     def get_recipes_count(self, obj):
         return obj.recipes.count()
+
+
+class SubscribeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Follow
+        fields = (
+            'email',
+            'first_name'
+            'last_name'
+        )
