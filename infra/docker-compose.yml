@@ -16,7 +16,7 @@ services:
       - db_data:/var/lib/postgresql/data/
 
   backend:
-    build: ../backend
+    image: kiselevdv/foodgram-backend:latest
     restart: always
     volumes:
       - static_value:/app/static/
@@ -28,9 +28,7 @@ services:
       - .env
 
   frontend:
-    build:
-      context: ../frontend
-      dockerfile: Dockerfile
+    image: kiselevdv/foodgram-frontend:latest
     depends_on:
       - backend
     volumes:
