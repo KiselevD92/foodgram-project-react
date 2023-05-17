@@ -159,7 +159,7 @@ class SubscribeSerializer(serializers.ModelSerializer):
     last_name = serializers.ReadOnlyField(source='following.last_name')
 
     class Meta:
-        model = Follow
+        model = User
         fields = (
             'email',
             'first_name'
