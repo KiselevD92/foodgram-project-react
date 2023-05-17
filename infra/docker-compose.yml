@@ -28,7 +28,7 @@ services:
       - .env
 
   frontend:
-    image: kiselevdv/foodgram-frontend:latest
+    image: kiselevdv/foodgram-frontend:v1
     depends_on:
       - backend
     volumes:
