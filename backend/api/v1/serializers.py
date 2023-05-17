@@ -154,6 +154,10 @@ class FollowSerializer(serializers.ModelSerializer):
 
 
 class SubscribeSerializer(serializers.ModelSerializer):
+    email = serializers.ReadOnlyField(source='following.email')
+    first_name = serializers.ReadOnlyField(source='following.first_name')
+    last_name = serializers.ReadOnlyField(source='following.last_name')
+
     class Meta:
         model = Follow
         fields = (
