@@ -142,6 +142,7 @@ class RecipeTag(models.Model):
         on_delete=models.CASCADE,
         related_name='recipetags'
     )
+
     class Meta:
         verbose_name = 'Тег в рецепте'
         verbose_name_plural = 'Теги в рецепте'

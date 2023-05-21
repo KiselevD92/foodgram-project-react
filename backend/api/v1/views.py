@@ -107,7 +107,6 @@ class CustomUsersViewSet(viewsets.ModelViewSet):
     pagination_class = LimitOffsetPagination
     permission_classes = (AllowAny,)
 
-
     @action(detail=False, permission_classes=(IsAuthenticated,),
             methods=['post'])
     def set_password(self, request, *args, **kwargs):
