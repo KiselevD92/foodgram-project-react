@@ -1,4 +1,4 @@
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
 
 from users.models import User
@@ -7,27 +7,31 @@ from users.models import User
 class Tag(models.Model):
     name = models.CharField(
         max_length=200,
+        unique=True,
         verbose_name='Наименование тега',
     )
     color = models.CharField(
-        null=True,
+        verbose_name='Цвет в HEX-кодировке',
         max_length=7,
-        verbose_name='Цветовой HEX-код'
+        null=True,
+        unique=True,
+        validators=[
+            RegexValidator(
+                '^#([a-fA-F0-9]{6})',
+                message='Нужен HEX-код цвета.'
+            )
+        ]
     )
     slug = models.SlugField(
         max_length=200,
+        unique=True,
+        null=True,
         verbose_name='Slug',
     )
 
     class Meta:
         verbose_name = 'Тег'
         verbose_name_plural = 'Теги'
-        constraints = [
-            models.UniqueConstraint(
-                fields=['name', 'color', 'slug'],
-                name='unique tag'
-            )
-        ]
 
     def __str__(self):
         return self.name
@@ -77,9 +81,8 @@ class Recipe(models.Model):
         through_fields=('recipe', 'ingredient'),
         verbose_name='Ингредиенты',
     )
-    tag = models.ForeignKey(
+    tags = models.ManyToManyField(
         Tag,
-        on_delete=models.CASCADE,
         related_name='recipes',
         verbose_name='Тег',
     )
@@ -128,6 +131,22 @@ class RecipeIngredient(models.Model):
         verbose_name_plural = 'Ингредиенты в рецепте'
 
 
+class RecipeTag(models.Model):
+    tag = models.ForeignKey(
+        Tag,
+        on_delete=models.CASCADE,
+        related_name='recipetags'
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='recipetags'
+    )
+    class Meta:
+        verbose_name = 'Тег в рецепте'
+        verbose_name_plural = 'Теги в рецепте'
+
+
 class Favorite(models.Model):
     user = models.ForeignKey(
         User,
@@ -142,6 +161,7 @@ class Favorite(models.Model):
 
     class Meta:
         verbose_name = 'Избранное'
+        verbose_name_plural = 'Избранное'
         constraints = [
             models.UniqueConstraint(
                 fields=['user', 'recipe'],
@@ -164,6 +184,7 @@ class ShoppingCart(models.Model):
 
     class Meta:
         verbose_name = 'Список_покупок'
+        verbose_name_plural = 'Список_покупок'
         constraints = [
             models.UniqueConstraint(
                 fields=['user', 'recipe'],
