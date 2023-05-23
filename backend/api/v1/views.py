@@ -9,7 +9,7 @@ from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from api.v1.filters import RecipeFilter
+from api.v1.filters import RecipeFilter, IngredientFilter
 from api.v1.permissions import IsAuthorOrReadOnly
 from api.v1.serializers import (
     RecipeSerializer, TagSerializer,
@@ -82,7 +82,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             shopping_cart.append(
                 f'{ingredient["ingredient__name"]}:'
                 f' {ingredient["amount"]}'
-                f' {ingredient["ingredient__measurement_unit"]}'
+                f' {ingredient["ingredient__measurement_unit"]}\n'
             )
 
         response = HttpResponse(
@@ -126,6 +126,7 @@ class IngredientViewSet(viewsets.ModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     pagination_class = None
+    filterset_class = IngredientFilter
     permission_classes = (AllowAny,)
 
 
