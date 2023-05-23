@@ -31,7 +31,7 @@ kiselevdv/foodgram-backend:latest
 
 ## Данные для входа в админку:
 ```bash
-Username: admin
+email: admin@admin.ru
 Password: admin
 ```
 
