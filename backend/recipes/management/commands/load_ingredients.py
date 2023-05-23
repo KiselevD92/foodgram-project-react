@@ -1,6 +1,5 @@
 import csv
 
-from django.conf import settings
 from django.core.management import BaseCommand
 
 from recipes.models import Ingredient
@@ -11,7 +10,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         with open(
-            f'./data/ingredients.csv',
+            './data/ingredients.csv',
             'r',
             encoding='utf-8'
         ) as file:
