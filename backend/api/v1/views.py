@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.db.models import Sum
 from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, status
@@ -14,9 +15,13 @@ from api.v1.serializers import (
     RecipeSerializer, TagSerializer,
     IngredientSerializer, UserSerializer,
     ShortInfoRecipeSerializer, SetPasswordSerializer,
-    SubscribeSerializer, GetSubscriptions
+    SubscribeSerializer, GetSubscriptions, RecipeCreateUpdateSerializer
 )
-from recipes.models import Recipe, Tag, Ingredient, Favorite, ShoppingCart
+from recipes.models import (
+    Recipe, Tag,
+    Ingredient, Favorite,
+    ShoppingCart, RecipeIngredient
+)
 from users.models import Follow
 
 User = get_user_model()
@@ -24,11 +29,15 @@ User = get_user_model()
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
-    serializer_class = RecipeSerializer
     pagination_class = LimitOffsetPagination
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
     permission_classes = (IsAuthorOrReadOnly,)
+
+    def get_serializer_class(self):
+        if self.action in ('list', 'retrieve'):
+            return RecipeSerializer
+        return RecipeCreateUpdateSerializer
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -56,14 +65,33 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'],
             permission_classes=(IsAuthenticated,))
     def download_shopping_cart(self, request):
-        result = ShoppingCart.object.get(user=self.request.user)
+        user = self.request.user
+        filename = 'shopping_cart.txt'
+        shopping_cart = [
+            f'Список покупок для:'
+            f'{user.first_name} {user.last_name}\n'
+        ]
+        ingredients = (
+            RecipeIngredient.objects
+            .filter(recipe__shoppingcart__user=user)
+            .values('ingredient__name', 'ingredient__measurement_unit')
+            .annotate(amount=Sum('amount'))
+        )
+
+        for ingredient in ingredients:
+            shopping_cart.append(
+                f'{ingredient["ingredient__name"]}:'
+                f' {ingredient["amount"]}'
+                f' {ingredient["ingredient__measurement_unit"]}'
+            )
+
         response = HttpResponse(
-            'Список покупок: ' + result,
+            shopping_cart,
             content_type='text/plain'
         )
         response[
             'Content-Disposition'
-        ] = 'attachment; filename="shopping_cart.txt"'
+        ] = f'attachment; filename={filename}'
         return response
 
     @action(detail=True, methods=['post', 'delete'],
@@ -97,7 +125,7 @@ class TagViewSet(viewsets.ModelViewSet):
 class IngredientViewSet(viewsets.ModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    pagination_class = LimitOffsetPagination
+    pagination_class = None
     permission_classes = (AllowAny,)
 
 

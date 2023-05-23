@@ -1,3 +1,7 @@
+import base64
+
+from django.core.files.base import ContentFile
+from django.db import transaction
 from rest_framework import serializers
 
 from recipes.models import (
@@ -123,13 +127,90 @@ class RecipeSerializer(serializers.ModelSerializer):
                                             recipe=obj).exists()
         )
 
+
+class IngredientCreateInRecipeSerializer(serializers.ModelSerializer):
+    recipe = serializers.PrimaryKeyRelatedField(read_only=True)
+    id = serializers.PrimaryKeyRelatedField(
+        source='ingredient',
+        queryset=Ingredient.objects.all()
+    )
+    amount = serializers.IntegerField(write_only=True, min_value=1)
+
+    class Meta:
+        model = RecipeIngredient
+        fields = ('recipe', 'id', 'amount',)
+
+
+class Base64ImageField(serializers.ImageField):
+    def to_internal_value(self, data):
+        if isinstance(data, str) and data.startswith('data:image'):
+            format, imgstr = data.split(';base64,')
+            ext = format.split('/')[-1]
+            data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
+            return super().to_internal_value(data)
+
+
+class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
+    ingredients = IngredientCreateInRecipeSerializer(many=True)
+    tags = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Tag.objects.all()
+    )
+    image = Base64ImageField()
+    author = UserSerializer(required=False)
+
+    def validate_ingredients(self, value):
+        if len(value) < 1:
+            raise serializers.ValidationError(
+                'Добавьте хотя бы один ингредиент'
+            )
+        return value
+
+    @transaction.atomic
     def create(self, validated_data):
-        tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')
+        tags = validated_data.pop('tags')
         recipe = Recipe.objects.create(**validated_data)
         recipe.tags.set(tags)
-        recipe.ingredients.set(ingredients)
+        create_ingredients = [
+            RecipeIngredient(
+                recipe=recipe,
+                ingredient=ingredient['ingredient'],
+                amount=ingredient['amount']
+            )
+            for ingredient in ingredients
+        ]
+        RecipeIngredient.objects.bulk_create(
+            create_ingredients
+        )
         return recipe
+
+    def update(self, instance, validated_data):
+        ingredients = validated_data.pop('ingredients', None)
+        tags = validated_data.pop('tags', None)
+        if tags is not None:
+            instance.tags.set(tags)
+        if ingredients is not None:
+            instance.ingredients.clear()
+            create_ingredients = [
+                RecipeIngredient(
+                    recipe=instance,
+                    ingredient=ingredient['ingredient'],
+                    amount=ingredient['amount']
+                )
+                for ingredient in ingredients
+            ]
+            RecipeIngredient.objects.bulk_create(
+                create_ingredients
+            )
+        return super().update(instance, validated_data)
+
+    def to_representation(self, obj):
+        return RecipeSerializer(obj, context=self.context).data
+
+    class Meta:
+        model = Recipe
+        exclude = ('pub_date',)
 
 
 class ShortInfoRecipeSerializer(serializers.ModelSerializer):
